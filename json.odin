@@ -3,6 +3,11 @@ package json
 import "core:strings"
 import "core:fmt"
 
+// =======================
+//    		TOKENIZER
+// =======================
+
+
 // A tokens data
 Token :: struct{
 	type: Token_type,
@@ -151,4 +156,19 @@ tokenize :: proc(data: string, i: ^int) -> (Token, Error){
 
 	return token, .NO_ERROR
 }
+
+
+// =====================
+//    		PARSER
+// =====================
+
+Value :: union{
+	int,
+	f32,
+	bool,
+	string,
+	[]Value, 
+	map[string]Value,
+}
+
 
