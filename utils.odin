@@ -1,6 +1,7 @@
 package json
 
 import "core:strings"
+import "core:strconv"
 import "core:fmt"
 
 has_file_suffix :: proc(filename: string, suffix: cstring) -> bool{
@@ -54,6 +55,14 @@ VALID_TOKENS : [6]u8: {'{', '}', '[', ']', ',', ':'}
 char_is_token :: proc(char: u8) -> bool{
 	for t in VALID_TOKENS{
 		if char == t do return true
+	}
+
+	return false
+}
+
+number_value_is_float :: proc(s: string) -> bool{
+	for char in s{
+		if char == '.' do return true
 	}
 
 	return false

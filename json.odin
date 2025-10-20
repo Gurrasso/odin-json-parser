@@ -1,5 +1,7 @@
+#+feature dynamic-literals
 package json
 
+import "core:strconv"
 import "core:strings"
 import "core:fmt"
 
@@ -171,4 +173,131 @@ Value :: union{
 	map[string]Value,
 }
 
+// Initiates the recursive tokenizing
+parse :: proc(tokens: [MAX_TOKENS]Token) -> (Value, Error){
+	value, err := parse_token(0, tokens)
 
+	if err != .NO_ERROR do return value, err
+
+	if ODIN_DEBUG {
+		fmt.println("// PRINTING PARSED DATA //\n", value)
+	}
+
+	return value, .NO_ERROR
+}
+
+//Recursivly goes through the list of tokens converting them all into a singe value struct
+parse_token :: proc(index: int, tokens: [MAX_TOKENS]Token) -> (Value, Error){
+	
+	token := tokens[index]
+	value: Value
+	
+
+	switch token.type{
+	case .STRING_VALUE:
+		value = token.value
+	case .NUMBER_VALUE:
+
+		ok: bool
+		
+		if number_value_is_float(token.value) do value, ok = strconv.parse_f32(token.value)
+		else do value, ok = strconv.parse_int(token.value)
+
+		if !ok do return value, .STRING_TO_NUMBER_CONVERSION_FAILED
+
+	case .BOOL_VALUE:
+		ok: bool
+
+		value, ok = strconv.parse_bool(token.value)
+
+		if !ok do return value, .STRING_TO_BOOL_CONVERSION_FAILED
+
+	case .NULL_VALUE:
+		value = nil
+	
+	case .OPEN_CURLY_BRACKET:
+		bracket_count: int = 1
+
+		object := make(map[string]Value)
+
+		for j in index+1..<len(tokens){
+
+			t := tokens[j]
+
+			if t.type == .OPEN_CURLY_BRACKET{
+				bracket_count += 1
+			}else if t.type == .CLOSED_CURLY_BRACKET{
+				bracket_count -= 1
+			}
+
+			if bracket_count == 0{
+				break
+			}else if bracket_count == 1{
+				if t.type == .ID{
+					err: Error
+
+					object[t.value], err = parse_token(j+1, tokens)
+					if err != .NO_ERROR do return value, err
+				}
+			}
+		}
+
+		value = object
+
+	case .OPEN_SQUARE_BRACKET:
+		bracket_count: int = 1
+
+		array: [dynamic]Value 
+
+		for j in index+1..<len(tokens){
+
+			t := tokens[j]
+
+			if t.type == .OPEN_SQUARE_BRACKET{
+				bracket_count += 1
+			}else if t.type == .CLOSED_SQUARE_BRACKET{
+				bracket_count -= 1
+			}
+
+
+			if bracket_count == 0{
+				break
+			}else if bracket_count == 1{
+				if t.type == .OPEN_SQUARE_BRACKET || t.type == .OPEN_SQUARE_BRACKET || t.type == .STRING_VALUE || t.type == .NUMBER_VALUE || t.type == .BOOL_VALUE || t.type == .NULL_VALUE{
+					
+					v, err := parse_token(j, tokens)
+
+					if err != .NO_ERROR do return value, err
+
+					append(&array, v)
+				}
+			}
+		}
+
+		value = array[:]
+	case .CLOSED_CURLY_BRACKET:
+		err: Error
+
+		value, err = parse_token(index+1, tokens)
+		if err != .NO_ERROR do return value, err
+	case .CLOSED_SQUARE_BRACKET:
+		err: Error
+
+		value, err = parse_token(index+1, tokens)
+		if err != .NO_ERROR do return value, err
+	case.COMMA:
+		err: Error
+
+		value, err = parse_token(index+1, tokens)
+		if err != .NO_ERROR do return value, err
+	case .ID:
+		return value, .ID_NOT_PART_OF_MAP
+
+	case .NIL:
+		return value, .FAILED_PARSE_NIL_TOKEN_TYPE
+	case:
+		return value, .FAILED_PARSE_INVALID_TOKEN_TYPE
+	}
+
+	return value, .NO_ERROR
+}
