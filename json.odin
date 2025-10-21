@@ -169,10 +169,10 @@ Integer :: int
 Float   :: f32
 Boolean :: bool
 String  :: string
-Array   :: distinct []Value
+Array   :: distinct [dynamic]Value
 Object  :: distinct map[string]Value
 
-//Value union that uses slices for arrays and maps for objects
+//Value union that uses maps for objects
 Value :: union {
 	Integer,
 	Float,
@@ -254,10 +254,9 @@ parse_token :: proc(index: int, tokens: [MAX_TOKENS]Token) -> (Value, Error){
 
 		value = object
 
-	case .OPEN_SQUARE_BRACKET: // Counts the brackets and looks for values to parse and add to the array(slice)
+	case .OPEN_SQUARE_BRACKET: // Counts the brackets and looks for values to parse and add to the array
 		bracket_count: int = 1
 
-		//is slice but who cares
 		array: Array
 
 		for j in index+1..<len(tokens){
@@ -280,7 +279,7 @@ parse_token :: proc(index: int, tokens: [MAX_TOKENS]Token) -> (Value, Error){
 
 					if err != .NO_ERROR do return value, err
 
-					array[len(array)-1] = v
+					append(&array, v)
 				}
 			}
 		}

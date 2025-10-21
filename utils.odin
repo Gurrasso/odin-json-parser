@@ -68,7 +68,7 @@ number_value_is_float :: proc(s: string) -> bool{
 	return false
 }
 
-
+// takes in a file and returns a Value
 parse_file :: proc(filepath: string) -> (Value, Error){
 	file_data, load_err := load_file(filepath)
 	if load_err != .NO_ERROR do return nil, load_err
