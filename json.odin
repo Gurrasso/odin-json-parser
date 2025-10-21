@@ -180,7 +180,8 @@ parse :: proc(tokens: [MAX_TOKENS]Token) -> (Value, Error){
 	if err != .NO_ERROR do return value, err
 
 	if ODIN_DEBUG {
-		fmt.println("// PRINTING PARSED DATA //\n", value)
+		fmt.println("// PRINTING PARSED DATA //")
+		fmt.println(value)
 	}
 
 	return value, .NO_ERROR
