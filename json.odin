@@ -41,20 +41,22 @@ MAX_TOKENS :: 1024
 // Takes in json data and tokenizes it line by line
 tokenize_json_data :: proc(data: File_data) -> ([MAX_TOKENS]Token, Error){
 	string_data := clean_file_data(data)
-
-	if ODIN_DEBUG{
-		if len(string_data) == 0 do fmt.println("OBS! json data given is empty")
-		else do fmt.println("Cleaned json data: ", string_data)
-	}
-
+	no_whitespace_string_data := remove_whitespace(string_data)
+	
 	tokens: [MAX_TOKENS]Token
 	tokens_cursor: int
+
+	if len(no_whitespace_string_data) == 0 do return tokens, .NO_DATA_TO_TOKENIZE
+	else if ODIN_DEBUG do fmt.println("Cleaned json data:", no_whitespace_string_data)
 
 	for i := 0; i <len(string_data); i+=1{
 		if tokens_cursor >= len(tokens)-1{
 			// We have exceeded the max amount of tokens
 			return tokens, .TOKEN_LIMIT_EXCEEDED
 		}
+
+		//skip tabs and spaces
+		if string_data[i] == ' ' || string_data[i] == '	' do continue
 		
 		value: Token
 		err: Error

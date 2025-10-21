@@ -22,7 +22,13 @@ clean_file_data :: proc(data: File_data) -> string{
   output, _ = strings.replace(output, "\n", "", -1)
 	output, _ = strings.replace(output, "\r", "", -1)
 
-	// Remove tabs and spaces
+	return output
+}
+
+//removes all tabs and spaces from a string
+remove_whitespace :: proc(str: string) -> string{
+	output := str
+
 	output, _ = strings.replace(output, " ", "", -1)
 	output, _ = strings.replace(output, "	", "", -1)
 
