@@ -164,13 +164,22 @@ tokenize :: proc(data: string, i: ^int) -> (Token, Error){
 //    		PARSER
 // =====================
 
-Value :: union{
-	int,
-	f32,
-	bool,
-	string,
-	[]Value, 
-	map[string]Value,
+//Type definitions
+Integer :: int
+Float   :: f32
+Boolean :: bool
+String  :: string
+Array   :: distinct []Value
+Object  :: distinct map[string]Value
+
+//Value union that uses slices for arrays and maps for objects
+Value :: union {
+	Integer,
+	Float,
+	Boolean,
+	String,
+	Array,
+	Object,
 }
 
 // Initiates the recursive tokenizing
@@ -197,7 +206,7 @@ parse_token :: proc(index: int, tokens: [MAX_TOKENS]Token) -> (Value, Error){
 	switch token.type{
 	case .STRING_VALUE:
 		value = token.value
-	case .NUMBER_VALUE:
+	case .NUMBER_VALUE: //Convert number to a float or and int depending on if it has a . in it
 
 		ok: bool
 		
@@ -206,7 +215,7 @@ parse_token :: proc(index: int, tokens: [MAX_TOKENS]Token) -> (Value, Error){
 
 		if !ok do return value, .STRING_TO_NUMBER_CONVERSION_FAILED
 
-	case .BOOL_VALUE:
+	case .BOOL_VALUE: //Converts the string into a bool
 		ok: bool
 
 		value, ok = strconv.parse_bool(token.value)
@@ -216,10 +225,10 @@ parse_token :: proc(index: int, tokens: [MAX_TOKENS]Token) -> (Value, Error){
 	case .NULL_VALUE:
 		value = nil
 	
-	case .OPEN_CURLY_BRACKET:
+	case .OPEN_CURLY_BRACKET: // Goes through counting brackets and if we reached the end bracket exits. It will also look for ids to also parse.
 		bracket_count: int = 1
 
-		object := make(map[string]Value)
+		object := make(Object)
 
 		for j in index+1..<len(tokens){
 
@@ -245,10 +254,11 @@ parse_token :: proc(index: int, tokens: [MAX_TOKENS]Token) -> (Value, Error){
 
 		value = object
 
-	case .OPEN_SQUARE_BRACKET:
+	case .OPEN_SQUARE_BRACKET: // Counts the brackets and looks for values to parse and add to the array(slice)
 		bracket_count: int = 1
 
-		array: [dynamic]Value 
+		//is slice but who cares
+		array: Array
 
 		for j in index+1..<len(tokens){
 
@@ -270,13 +280,13 @@ parse_token :: proc(index: int, tokens: [MAX_TOKENS]Token) -> (Value, Error){
 
 					if err != .NO_ERROR do return value, err
 
-					append(&array, v)
+					array[len(array)-1] = v
 				}
 			}
 		}
 
-		value = array[:]
-	case .CLOSED_CURLY_BRACKET:
+		value = array
+	case .CLOSED_CURLY_BRACKET: // I dont think we should reach these but if we do we just skip to the next value
 		err: Error
 
 		value, err = parse_token(index+1, tokens)
