@@ -76,15 +76,40 @@ number_value_is_float :: proc(s: string) -> bool{
 
 // takes in a file and returns a Value
 parse_file :: proc(filepath: string) -> (Value, Error){
+
+	// Load the file and get the data
 	file_data, load_err := load_file(filepath)
 	if load_err != .NO_ERROR do return nil, load_err
+	defer delete(file_data) // Free the file data after parse is done
 
+	// Tokenize file data
 	tokens, tokenizer_err := tokenize_json_data(file_data)
 	if tokenizer_err != .NO_ERROR do return nil, tokenizer_err
 
+	// Parse data
 	parsed_data, parse_err := parse(tokens)
 	if parse_err != .NO_ERROR do return nil, parse_err
 
 	return parsed_data, .NO_ERROR
 }
 
+//Destroy a value union
+destroy_value :: proc(value: ^Value) -> Error{
+
+	#partial switch v in value {
+	case Object:
+		for _, &second_value in value.(Object){
+			destroy_value(&second_value)
+		}
+		err := delete_map(value.(Object))
+		if err != .None do return .ERROR_DELETING_VALUE
+	case Array:
+		for &second_value in value.(Array){
+			destroy_value(&second_value)
+		}
+		err := delete_dynamic_array(value.(Array))
+		if err != .None do return .ERROR_DELETING_VALUE
+	}
+
+	return .NO_ERROR
+}

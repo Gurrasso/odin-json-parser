@@ -1,3 +1,8 @@
+/*
+	
+	TODO: Free memory, more checks for invalid syntax 
+
+*/
 package json
 
 import "core:fmt"
@@ -22,4 +27,6 @@ Error :: enum{
 	FAILED_PARSE_NIL_TOKEN_TYPE,
 
 	ID_NOT_PART_OF_MAP,
+	
+	ERROR_DELETING_VALUE,
 }

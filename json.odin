@@ -249,7 +249,15 @@ parse_token :: proc(index: int, tokens: [MAX_TOKENS]Token) -> (Value, Error){
 					err: Error
 
 					object[t.value], err = parse_token(j+1, tokens)
-					if err != .NO_ERROR do return value, err
+					if err != .NO_ERROR {
+						//free the memory on error
+						for _, &second_value in object{
+							destroy_value(&second_value)
+						}
+						delete(object)
+
+						return value, err
+					}
 				}
 			}
 		}
@@ -279,7 +287,15 @@ parse_token :: proc(index: int, tokens: [MAX_TOKENS]Token) -> (Value, Error){
 					
 					v, err := parse_token(j, tokens)
 
-					if err != .NO_ERROR do return value, err
+					if err != .NO_ERROR {
+						//free the memory on error
+						for &second_value in array{
+							destroy_value(&second_value)
+						}
+						delete(array)
+
+						return value, err
+					}
 
 					append(&array, v)
 				}
@@ -287,6 +303,7 @@ parse_token :: proc(index: int, tokens: [MAX_TOKENS]Token) -> (Value, Error){
 		}
 
 		value = array
+
 	case .CLOSED_CURLY_BRACKET: // I dont think we should reach these but if we do we just skip to the next value
 		err: Error
 
