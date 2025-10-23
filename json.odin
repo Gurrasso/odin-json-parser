@@ -248,6 +248,16 @@ parse_token :: proc(index: int, tokens: [MAX_TOKENS]Token) -> (Value, Error){
 				if t.type == .ID{
 					err: Error
 
+					if t.value in object{
+						//free the memory on error
+						for _, &second_value in object{
+							destroy_value(&second_value)
+						}
+						delete(object)
+
+						return value, .ID_ALREADY_PART_OF_MAP
+					}
+
 					object[t.value], err = parse_token(j+1, tokens)
 					if err != .NO_ERROR {
 						//free the memory on error
@@ -303,7 +313,6 @@ parse_token :: proc(index: int, tokens: [MAX_TOKENS]Token) -> (Value, Error){
 		}
 
 		value = array
-
 	case .CLOSED_CURLY_BRACKET: // I dont think we should reach these but if we do we just skip to the next value
 		err: Error
 

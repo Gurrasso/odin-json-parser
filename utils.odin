@@ -1,7 +1,6 @@
 package json
 
 import "core:strings"
-import "core:strconv"
 import "core:fmt"
 
 has_file_suffix :: proc(filename: string, suffix: cstring) -> bool{
