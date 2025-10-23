@@ -16,6 +16,8 @@ Token :: struct{
 	value: string
 }
 
+Tokens :: [MAX_TOKENS]Token
+
 // The type of a token
 Token_type :: enum{
 	NIL,
@@ -39,11 +41,11 @@ Token_type :: enum{
 MAX_TOKENS :: 1024
 
 // Takes in json data and tokenizes it line by line
-tokenize_json_data :: proc(data: File_data) -> ([MAX_TOKENS]Token, Error){
+tokenize_json_data :: proc(data: File_data) -> (Tokens, Error){
 	string_data := clean_file_data(data)
 	no_whitespace_string_data := remove_whitespace(string_data)
 	
-	tokens: [MAX_TOKENS]Token
+	tokens: Tokens
 	tokens_cursor: int
 
 	if len(no_whitespace_string_data) == 0 do return tokens, .NO_DATA_TO_TOKENIZE
@@ -185,7 +187,7 @@ Value :: union {
 }
 
 // Initiates the recursive tokenizing
-parse :: proc(tokens: [MAX_TOKENS]Token) -> (Value, Error){
+parse :: proc(tokens: Tokens) -> (Value, Error){
 	value, err := parse_token(0, tokens)
 
 	if err != .NO_ERROR do return value, err
@@ -199,7 +201,7 @@ parse :: proc(tokens: [MAX_TOKENS]Token) -> (Value, Error){
 }
 
 //Recursivly goes through the list of tokens converting them all into a singe value struct
-parse_token :: proc(index: int, tokens: [MAX_TOKENS]Token) -> (Value, Error){
+parse_token :: proc(index: int, tokens: Tokens) -> (Value, Error){
 	
 	token := tokens[index]
 	value: Value
@@ -338,4 +340,30 @@ parse_token :: proc(index: int, tokens: [MAX_TOKENS]Token) -> (Value, Error){
 	}
 
 	return value, .NO_ERROR
+}
+
+// ======================
+//    STRINGIFY VALUE
+// ======================
+
+tokenize_value :: proc(value: Value) -> (Tokens, Error){
+	tokens: Tokens
+
+	switch v in value{
+	case String:
+	case Integer:
+	case Float:
+	case Boolean:
+	case Array:
+	case Object:
+	case:
+	}
+
+	return tokens, .NO_ERROR
+}
+
+stringify_tokens :: proc(tokens: Tokens) -> (string, Error){
+	output_string: string
+
+	return output_string, .NO_ERROR
 }

@@ -54,7 +54,7 @@ string_is_number :: proc(value: string) -> bool{
 	return true
 }
 
-VALID_TOKENS : [6]u8: {'{', '}', '[', ']', ',', ':'}
+VALID_TOKENS : [8]u8: {'{', '}', '[', ']', ',', ':', ' ', '	'}
 
 // checks if char is a number or a . or -
 char_is_token :: proc(char: u8) -> bool{
