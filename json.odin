@@ -52,11 +52,7 @@ tokenize_json_data :: proc(data: File_data) -> (Tokens, Error){
 	else if ODIN_DEBUG do fmt.println("Cleaned json data:", no_whitespace_string_data)
 
 	for i := 0; i <len(string_data); i+=1{
-		if tokens_cursor >= len(tokens)-1{
-			// We have exceeded the max amount of tokens
-			return tokens, .TOKEN_LIMIT_EXCEEDED
-		}
-
+		
 		//skip tabs and spaces
 		if string_data[i] == ' ' || string_data[i] == '	' do continue
 		
@@ -67,9 +63,9 @@ tokenize_json_data :: proc(data: File_data) -> (Tokens, Error){
 
 		if err != .NO_ERROR do return tokens, err
 
-		token := &tokens[tokens_cursor%len(tokens)]
-		token^ = value
-		tokens_cursor += 1
+		err = append_to_tokens(&tokens, &tokens_cursor, value)
+
+		if err != .NO_ERROR do return tokens, err
 	}
 
 	if ODIN_DEBUG && len(string_data) > 0{
@@ -346,14 +342,26 @@ parse_token :: proc(index: int, tokens: Tokens) -> (Value, Error){
 //    STRINGIFY VALUE
 // ======================
 
+// takes in the value and recursivly turns it into tokens
 tokenize_value :: proc(value: Value) -> (Tokens, Error){
 	tokens: Tokens
+	tokens_cursor: int
 
 	switch v in value{
 	case String:
+		append_to_tokens(&tokens, &tokens_cursor, Token{value = value.(String), type = .STRING_VALUE})
 	case Integer:
+		buf: [32]byte
+		string_value := strconv.write_int(buf[:], i64(value.(Integer)), 10)
+		append_to_tokens(&tokens, &tokens_cursor, Token{value = string_value, type = .NUMBER_VALUE})
 	case Float:
+		buf: [32]byte
+		string_value := strconv.write_float(buf[:], f64(value.(Float)), 'f', 14, 64)
+		append_to_tokens(&tokens, &tokens_cursor, Token{value = string_value, type = .NUMBER_VALUE})
 	case Boolean:
+		buf: [32]byte
+		string_value := strconv.write_bool(buf[:], value.(Boolean))
+		append_to_tokens(&tokens, &tokens_cursor, Token{value = string_value, type = .BOOL_VALUE})
 	case Array:
 	case Object:
 	case:
@@ -362,31 +370,37 @@ tokenize_value :: proc(value: Value) -> (Tokens, Error){
 	return tokens, .NO_ERROR
 }
 
+// takes in tokens and turns it into a string of json
 stringify_tokens :: proc(tokens: Tokens) -> (string, Error){
 	output_strings: [dynamic]string
 	output_string: string
 
+	defer delete(output_strings) // delete the dynamic array when we are done
+
+	// Loop through our tokens
 	for token in tokens{
 		if token.type == .NIL do break // break if token type is nil
 
+		// add the string we get to an array so we can join the array into a string later
 		append_string, err := stringify_token(token)
 		if err != .NO_ERROR do return output_string, err
 
 		append(&output_strings, append_string)
 	}
 
-	output_string = strings.join(output_strings[:], "")
-
-	delete(output_strings)
+	output_string = strings.join(output_strings[:], "") //Smush all the strings into one
 
 	return output_string, .NO_ERROR
 }
 
+// takes in a token and turns it into a string that can be part of a string of json
 stringify_token :: proc(token: Token) -> (string, Error){
 	output_string: string = token.value
 
+	// check for nil type
 	if token.type == nil do return output_string, .CANNOT_STRINGIFY_TOKEN_BECAUSE_OF_TYPE
 
+	// go through the token types that aren't as straight forward
 	#partial switch token.type{
 	case .NIL: //should never be reached
 		return output_string, .CANNOT_STRINGIFY_TOKEN_BECAUSE_OF_TYPE 

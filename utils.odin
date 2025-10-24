@@ -73,7 +73,7 @@ number_value_is_float :: proc(s: string) -> bool{
 	return false
 }
 
-// takes in a file and returns a Value
+// takes in a json file and returns a Value
 parse_file :: proc(filepath: string) -> (Value, Error){
 
 	// Load the file and get the data
@@ -123,3 +123,17 @@ destroy_value :: proc(value: ^Value) -> Error{
 	return .NO_ERROR
 }
 
+//tries to append tokens or a token to a tokens array
+append_to_tokens :: proc(tokens: ^Tokens, cursor: ^int, append_value: ..Token) -> Error{
+	if cursor^ >= len(tokens)-1{
+		// We have exceeded the max amount of tokens
+		return .TOKEN_LIMIT_EXCEEDED
+	}
+
+	for token in append_value {
+		tokens[cursor^] = token
+		cursor^ += 1
+	}
+
+	return .NO_ERROR
+}
