@@ -363,7 +363,41 @@ tokenize_value :: proc(value: Value) -> (Tokens, Error){
 }
 
 stringify_tokens :: proc(tokens: Tokens) -> (string, Error){
+	output_strings: [dynamic]string
 	output_string: string
+
+	for token in tokens{
+		if token.type == .NIL do break // break if token type is nil
+
+		append_string, err := stringify_token(token)
+		if err != .NO_ERROR do return output_string, err
+
+		append(&output_strings, append_string)
+	}
+
+	output_string = strings.join(output_strings[:], "")
+
+	delete(output_strings)
 
 	return output_string, .NO_ERROR
 }
+
+stringify_token :: proc(token: Token) -> (string, Error){
+	output_string: string = token.value
+
+	if token.type == nil do return output_string, .CANNOT_STRINGIFY_TOKEN_BECAUSE_OF_TYPE
+
+	#partial switch token.type{
+	case .NIL: //should never be reached
+		return output_string, .CANNOT_STRINGIFY_TOKEN_BECAUSE_OF_TYPE 
+	
+	case .ID:
+		output_string = strings.join({"\"", output_string, "\"", ":"}, "")
+
+	case .STRING_VALUE:
+		output_string = strings.join({"\"", output_string, "\""}, "")
+	}
+
+	return output_string, .NO_ERROR
+}
+

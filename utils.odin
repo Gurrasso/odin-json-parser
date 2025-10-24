@@ -92,6 +92,16 @@ parse_file :: proc(filepath: string) -> (Value, Error){
 	return parsed_data, .NO_ERROR
 }
 
+stringify_value :: proc(value: Value) -> (string, Error){
+	tokens, tokenize_err := tokenize_value(value)
+	if tokenize_err != .NO_ERROR do return "", tokenize_err
+
+	output_string, stringify_err := stringify_tokens(tokens)
+	if stringify_err != .NO_ERROR do return output_string, stringify_err
+
+	return output_string, .NO_ERROR
+}
+
 //Destroy a value union
 destroy_value :: proc(value: ^Value) -> Error{
 
@@ -112,3 +122,4 @@ destroy_value :: proc(value: ^Value) -> Error{
 
 	return .NO_ERROR
 }
+
