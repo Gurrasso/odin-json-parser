@@ -137,3 +137,18 @@ append_to_tokens :: proc(tokens: ^Tokens, cursor: ^int, append_value: ..Token) -
 
 	return .NO_ERROR
 }
+
+//tries to append tokens or a token to a tokens array
+append_to_tokens_slice :: proc(tokens: ^Tokens, cursor: ^int, append_value: []Token) -> Error{
+	if cursor^ >= len(tokens)-1{
+		// We have exceeded the max amount of tokens
+		return .TOKEN_LIMIT_EXCEEDED
+	}
+
+	for token in append_value {
+		tokens[cursor^] = token
+		cursor^ += 1
+	}
+
+	return .NO_ERROR
+}

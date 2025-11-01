@@ -30,7 +30,7 @@ Token_type :: enum{
 
 	COMMA,
 
-	ID,
+	KEY,
 	STRING_VALUE,
 	NUMBER_VALUE,
 	BOOL_VALUE,
@@ -75,7 +75,7 @@ tokenize_json_data :: proc(data: File_data) -> (Tokens, Error){
 		}
 	}
 
-	// TODO: maybe validate the tokens like checking that we have the same number of open as closed brackets and that all ids have a value ect.
+	// TODO: maybe validate the tokens like checking that we have the same number of open as closed brackets and that all keys have a value ect.
 
 	return tokens, .NO_ERROR
 }
@@ -114,7 +114,7 @@ tokenize :: proc(data: string, i: ^int) -> (Token, Error){
 					token.value = value
 
 					if data[j+1] == ':'{
-						token.type = .ID
+						token.type = .KEY
 
 						//this skips the semi-colon
 						i^ = j+1
@@ -243,7 +243,7 @@ parse_token :: proc(index: int, tokens: Tokens) -> (Value, Error){
 			if bracket_count == 0{
 				break
 			}else if bracket_count == 1{
-				if t.type == .ID{
+				if t.type == .KEY{
 					err: Error
 
 					if t.value in object{
@@ -253,7 +253,7 @@ parse_token :: proc(index: int, tokens: Tokens) -> (Value, Error){
 						}
 						delete(object)
 
-						return value, .ID_ALREADY_PART_OF_MAP
+						return value, .KEY_ALREADY_PART_OF_MAP
 					}
 
 					object[t.value], err = parse_token(j+1, tokens)
@@ -326,8 +326,8 @@ parse_token :: proc(index: int, tokens: Tokens) -> (Value, Error){
 
 		value, err = parse_token(index+1, tokens)
 		if err != .NO_ERROR do return value, err
-	case .ID:
-		return value, .ID_NOT_PART_OF_MAP
+	case .KEY:
+		return value, .KEY_NOT_PART_OF_MAP
 
 	case .NIL:
 		return value, .FAILED_PARSE_NIL_TOKEN_TYPE
@@ -342,30 +342,77 @@ parse_token :: proc(index: int, tokens: Tokens) -> (Value, Error){
 //    STRINGIFY VALUE
 // ======================
 
-// takes in the value and recursivly turns it into tokens
+// takes in the value and gives back a tokens array
 tokenize_value :: proc(value: Value) -> (Tokens, Error){
-	tokens: Tokens
+	return_tokens: Tokens
 	tokens_cursor: int
+	
+	tokens, err := get_tokens_from_value(value)
+	if err != .NO_ERROR do return return_tokens, err
+
+	append_to_tokens_slice(&return_tokens, &tokens_cursor, tokens[:])
+
+	delete_dynamic_array(tokens)
+
+	return return_tokens, .NO_ERROR
+}
+
+// tokenizes a value recursivly and returns a dynamic array
+get_tokens_from_value :: proc(value: Value) -> ([dynamic]Token, Error){
+	tokens: [dynamic]Token
 
 	switch v in value{
 	case String:
-		append_to_tokens(&tokens, &tokens_cursor, Token{value = value.(String), type = .STRING_VALUE})
+		append(&tokens, Token{value = value.(String), type = .STRING_VALUE})
 	case Integer:
 		buf: [32]byte
 		string_value := strconv.write_int(buf[:], i64(value.(Integer)), 10)
-		append_to_tokens(&tokens, &tokens_cursor, Token{value = string_value, type = .NUMBER_VALUE})
+		append(&tokens, Token{value = strings.clone(string_value), type = .NUMBER_VALUE})
 	case Float:
 		buf: [32]byte
 		string_value := strconv.write_float(buf[:], f64(value.(Float)), 'f', 14, 64)
-		append_to_tokens(&tokens, &tokens_cursor, Token{value = string_value, type = .NUMBER_VALUE})
+		append(&tokens, Token{value = strings.clone(string_value), type = .NUMBER_VALUE})
 	case Boolean:
 		buf: [32]byte
 		string_value := strconv.write_bool(buf[:], value.(Boolean))
-		append_to_tokens(&tokens, &tokens_cursor, Token{value = string_value, type = .BOOL_VALUE})
+		append(&tokens, Token{value = strings.clone(string_value), type = .BOOL_VALUE})
 	case Array:
+		append(&tokens, Token{value = "[", type = .OPEN_SQUARE_BRACKET})
+		for elem, iterator in value.(Array) {
+			elem_tokens, err := get_tokens_from_value(elem)
+			if err != .NO_ERROR do return tokens, err
+
+			for token in elem_tokens{
+				append(&tokens, token)
+			}
+			if iterator != len(value.(Array))-1 do append(&tokens, Token{value = ",", type = .COMMA})
+			delete(elem_tokens)
+		}
+		append(&tokens, Token{value = "]", type = .CLOSED_SQUARE_BRACKET})
 	case Object:
+		append(&tokens, Token{value = "{", type = .OPEN_CURLY_BRACKET})
+		iterator: int
+		for key, obj in value.(Object) {
+			obj_tokens, err := get_tokens_from_value(obj)
+			if err != .NO_ERROR do return tokens, err
+			append(&tokens, Token{value = key, type = .KEY})
+
+			for token in obj_tokens{
+				append(&tokens, token)
+			}
+			
+			if iterator != len(value.(Object))-1 do append(&tokens, Token{value = ",", type = .COMMA})
+
+			delete(obj_tokens)
+			iterator += 1
+		}
+		append(&tokens, Token{value = "}", type = .CLOSED_CURLY_BRACKET})
+	case nil:
+		append(&tokens, Token{value = "null", type = .NULL_VALUE})
 	case:
+		return tokens, .CANNOT_TOKENIZE_VALUE_BECAUSE_OF_TYPE
 	}
+
 
 	return tokens, .NO_ERROR
 }
@@ -405,7 +452,7 @@ stringify_token :: proc(token: Token) -> (string, Error){
 	case .NIL: //should never be reached
 		return output_string, .CANNOT_STRINGIFY_TOKEN_BECAUSE_OF_TYPE 
 	
-	case .ID:
+	case .KEY:
 		output_string = strings.join({"\"", output_string, "\"", ":"}, "")
 
 	case .STRING_VALUE:
