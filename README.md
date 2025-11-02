@@ -39,9 +39,8 @@ if err != .NO_ERROR do return foo, err
 
 #### Basic way to use the package
 
-* Parsing
 
-Lets look at how to use the parser using the parse_file proc in the utils file. This is the simplest way to parse a file.
+* Lets look at how to use the parser using the parse_file proc in the utils file. This is the simplest way to parse a file.
 ```odin
 package main
 
@@ -61,7 +60,7 @@ main :: proc(){
 
 ```
 
-All parsed data gets returned as a Value union
+* All parsed data gets returned as a Value union
 ```odin
 // The value union looks like this
 Value :: union {
@@ -98,9 +97,8 @@ data, _ := json.parse_file("path_to_our_file.json")
 bar := data.(json.Object)["foo"].(Object)["bar"]
 ```
 
-* Stringifying
 
-When we want to stringify a Value we can use the stringify_value proc from the utils file
+* When we want to stringify a Value we can use the stringify_value proc from the utils file
 ```odin
 #+feature dynamic-literals
 package main
@@ -147,28 +145,28 @@ No license right now, will maybe add one later.
 
 * Add a proc for getting info about errors from the Error enum
 
-Could look like this:
-```odin
-package main
+    Could look like this:
+    ```odin
+    package main
 
-import "shared:odin-json-parser"
-import "core:fmt"
+    import "shared:odin-json-parser"
+    import "core:fmt"
 
-main :: proc(){
-    data, err := json.random_proc()
+    main :: proc(){
+        data, err := json.random_proc()
 
-    if err != .NO_ERROR {
-        // Get a string describing the error and what might cause it
-        fmt.println(json.get_error_data(err))
+        if err != .NO_ERROR {
+            // Get a string describing the error and what might cause it
+            fmt.println(json.get_error_data(err))
 
-        return
+            return
+        }
     }
-}
-```
+    ```
 
 * More strict json syntax checks
 
 * Better formatted json when stringifying
 
-Have the option to get nice indented json back when stringifying. 
-Good for readability
+    Have the option to get nice indented json back when stringifying. 
+    Good for readability
