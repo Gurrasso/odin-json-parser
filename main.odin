@@ -1,8 +1,3 @@
-/*
-	
-	TODO: Free memory, more checks for invalid syntax 
-
-*/
 package json
 
 import "core:fmt"

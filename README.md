@@ -26,7 +26,7 @@ odin build path_to_code -debug
 ```
 
 * Lets first take a small look at the error handeling
-```
+```odin
 // Errors are an enum and any error will be returned through the procedures like this.
 
 foo, err := get_data(bar)
@@ -40,7 +40,7 @@ if err != .NO_ERROR do return foo, err
 #### Basic way to use the package
 
 * Now lets look at how to use the parser using the parse_file proc in the utils file. This is the simplest way to parse a file.
-```
+```odin
 package main
 
 import "shared:odin-json-parser"
@@ -60,7 +60,7 @@ main :: proc(){
 ```
 
 * All parsed data gets returned as a Value union
-```
+```odin
 // The value union looks like this
 Value :: union {
 	Integer,
@@ -79,16 +79,17 @@ String  :: string
 Array   :: distinct [dynamic]Value    // The Array and Object types contain Value which means we can have values in values in values just like with javascript objects
 Object  :: distinct map[string]Value  // Since odin doesn't have any javascript objects we use maps with strings as keys
 ```
-```
-// Lets say we have some json that looks like this:
-/*{
+* Lets say we have some json that looks like this:
+```json
+{
     "foo": {
         "bar": [139123, 1201]
     }
-}*/
-
-// And we have parsed this json into a Value
-data, _ := json.parse_file("data.json")
+}
+```
+* We can parse this json into a Value and get our data
+```odin
+data, _ := json.parse_file("path_to_our_file.json")
 
 // To get bar we can do look through the union
 // So we can use unions type assertions to look into the Value and get our data
@@ -96,7 +97,7 @@ bar := data.(json.Object)["foo"].(Object)["bar"]
 ```
 
 * When we want to stringify a Value we can use the stringify_value proc from the utils file
-```
+```odin
 #+feature dynamic-literals
 package main
 
@@ -137,3 +138,33 @@ odin version
 ## License
 
 No license right now, will maybe add one later.
+
+## TODO
+
+* Add a proc for getting info about errors from the Error enum
+
+Could look like this:
+```odin
+package main
+
+import "shared:odin-json-parser"
+import "core:fmt"
+
+main :: proc(){
+    data, err := json.random_proc()
+
+    if err != .NO_ERROR {
+        // Get a string describing the error and what might cause it
+        fmt.println(json.get_error_data(err))
+
+        return
+    }
+}
+```
+
+* More strict json syntax checks
+
+* Better formatted json when stringifying
+
+Have the option to get nice indented json back when stringifying. 
+Good for readability
