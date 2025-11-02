@@ -44,6 +44,8 @@ if err != .NO_ERROR do return foo, err
 
 #### Basic way to use the package
 
+#####   Parsing a json file
+
 * Lets look at how to use the parser using the parse_file proc in the utils file. This is the simplest way to parse a file.
 ```odin
 package main
@@ -101,6 +103,7 @@ data, _ := json.parse_file("path_to_our_file.json")
 bar := data.(json.Object)["foo"].(Object)["bar"]
 ```
 
+#####   Stringifying a Value
 
 * When we want to stringify a Value we can use the stringify_value proc from the utils file
 ```odin
