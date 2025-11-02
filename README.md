@@ -135,23 +135,23 @@ main :: proc(){
 ```odin
 parse_file :: proc(filepath: string) -> (Value, Error){
 
-	// We first load the file and get the data
-	file_data, load_err := load_file(filepath)
-	if load_err != .NO_ERROR do return nil, load_err
-	
+    // We first load the file and get the data
+    file_data, load_err := load_file(filepath)
+    if load_err != .NO_ERROR do return nil, load_err
+
     // And also delete the file data when we dont need it
     defer delete(file_data) 
 
-	// Then we tokenize the file data
+    // Then we tokenize the file data
     // It takes in File_data and turns it into a Tokens array
-	tokens, tokenizer_err := tokenize_json_data(file_data)
-	if tokenizer_err != .NO_ERROR do return nil, tokenizer_err
+    tokens, tokenizer_err := tokenize_json_data(file_data)
+    if tokenizer_err != .NO_ERROR do return nil, tokenizer_err
 
-	// It then takes the Tokens array and turns it into a Value struct
-	parsed_data, parse_err := parse(tokens)
-	if parse_err != .NO_ERROR do return nil, parse_err
+    // It then takes the Tokens array and turns it into a Value struct
+    parsed_data, parse_err := parse(tokens)
+    if parse_err != .NO_ERROR do return nil, parse_err
 
-	return parsed_data, .NO_ERROR
+    return parsed_data, .NO_ERROR
 }
 ```
 
