@@ -20,12 +20,19 @@ The code is probably full of bugs, bad code and possibly memory leaks but it wor
 
 ### Executing program
 
-* There are some prints and such throughout the package. This is for debugging and most of them will only run when the -debug flag is used.
+* There are some prints and such throughout the package. This is for debugging and most of them will only run when the "-debug" flag is used.
 ```
 odin build path_to_code -debug
 ```
 
-* Lets first take a small look at the error handeling
+* There is also a hard limit on tokens. Any token array has a max size but this can be changed by changing the <span style="color:yellow">MAX_TOKENS</span>. constant in the code
+```odin
+// In the json.odin file we find this
+MAX_TOKENS :: 1024
+```
+
+
+* Lets take a small look at the error handeling
 ```odin
 // Errors are an enum and any error will be returned through the procedures like this.
 
@@ -93,7 +100,7 @@ We can parse this json into a Value and get our data
 data, _ := json.parse_file("path_to_our_file.json")
 
 // To get bar we can do look through the union
-// So we can use unions type assertions to look into the Value and get our data
+// We can use unions type assertions to look into the Value and get our data
 bar := data.(json.Object)["foo"].(Object)["bar"]
 ```
 
@@ -125,8 +132,7 @@ main :: proc(){
 
 #### More in depth usage and explanations
 
-
-
+Cooming soon
 
 ## Help
 
