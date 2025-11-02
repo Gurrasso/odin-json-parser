@@ -12,7 +12,7 @@ The code is probably full of bugs, bad code and possibly memory leaks but it wor
 
 ### Dependencies
 
-* All you need to run this is the odin compiler along with the standard odin packages(core, base, ect)
+* All you need to use this is the odin compiler along with the standard odin packages(core, base, ect)
 
 ### Installing
 
@@ -39,7 +39,9 @@ if err != .NO_ERROR do return foo, err
 
 #### Basic way to use the package
 
-* Now lets look at how to use the parser using the parse_file proc in the utils file. This is the simplest way to parse a file.
+* Parsing
+
+Lets look at how to use the parser using the parse_file proc in the utils file. This is the simplest way to parse a file.
 ```odin
 package main
 
@@ -59,7 +61,7 @@ main :: proc(){
 
 ```
 
-* All parsed data gets returned as a Value union
+All parsed data gets returned as a Value union
 ```odin
 // The value union looks like this
 Value :: union {
@@ -79,7 +81,7 @@ String  :: string
 Array   :: distinct [dynamic]Value    // The Array and Object types contain Value which means we can have values in values in values just like with javascript objects
 Object  :: distinct map[string]Value  // Since odin doesn't have any javascript objects we use maps with strings as keys
 ```
-* Lets say we have some json that looks like this:
+Lets say we have some json that looks like this:
 ```json
 {
     "foo": {
@@ -87,7 +89,7 @@ Object  :: distinct map[string]Value  // Since odin doesn't have any javascript 
     }
 }
 ```
-* We can parse this json into a Value and get our data
+We can parse this json into a Value and get our data
 ```odin
 data, _ := json.parse_file("path_to_our_file.json")
 
@@ -96,7 +98,9 @@ data, _ := json.parse_file("path_to_our_file.json")
 bar := data.(json.Object)["foo"].(Object)["bar"]
 ```
 
-* When we want to stringify a Value we can use the stringify_value proc from the utils file
+* Stringifying
+
+When we want to stringify a Value we can use the stringify_value proc from the utils file
 ```odin
 #+feature dynamic-literals
 package main
