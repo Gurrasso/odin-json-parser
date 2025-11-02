@@ -1,12 +1,12 @@
 # ODIN json parser
 
-A parser and stringifier for json using the odin language.
+A parser and stringifier for json for the odin language.
 
 ## Description
 
 This is a simple parser and stringifier for odin. This can be used to write json to a file or to read json from a file. It's still a work in progress but the base functionality is there. There is already a json parser inside of "core:encoding/json".
 
-The code is probably full of bugs and bad code but it works. It also isn't very strict on your json syntax.
+The code is probably full of bugs, bad code and possibly memory leaks but it works. It also isn't very strict on your json syntax.
 
 ## Getting Started
 
@@ -20,10 +20,110 @@ The code is probably full of bugs and bad code but it works. It also isn't very 
 
 ### Executing program
 
+* There are some prints and such throughout the package. This is for debugging and most of them will only run when the -debug flag is used.
+```
+odin build path_to_code -debug
+```
+
 * Lets first take a small look at the error handeling
 ```
-// Errors are comprised of...
+// Errors are an enum and any error will be returned through the procedures like this.
+
+foo, err := get_data(bar)
+
+if err != .NO_ERROR do return foo, err
+
+// To see what the error does you can look at where it gets called or i might implement some sort of error check procedure in the future
+
 ```
+
+#### Basic way to use the package
+
+* Now lets look at how to use the parser using the parse_file proc in the utils file. This is the simplest way to parse a file.
+```
+package main
+
+import "shared:odin-json-parser"
+
+main :: proc(){
+    // This will return a Value which we will look more at later
+    parsed_data, err := json.parse_file("path_to_file.json")
+
+    // Once we are done with our parsed data it is a good idea to free it from memory by calling the destroy_value proc
+    // Here we just panic if we fail to destroy the value
+    defer if json.destroy_value(parsed_data) != .NO_ERROR do panic("Failed to destroy value")
+
+    // Handle an error if we get one 
+    if err != .NO_ERROR do handle_error()
+}
+
+```
+
+* All parsed data gets returned as a Value union
+```
+// The value union looks like this
+Value :: union {
+	Integer,
+	Float,
+	Boolean,
+	String,
+	Array,
+	Object,
+}
+
+// And all the types look like this
+Integer :: int
+Float   :: f32
+Boolean :: bool
+String  :: string
+Array   :: distinct [dynamic]Value    // The Array and Object types contain Value which means we can have values in values in values just like with javascript objects
+Object  :: distinct map[string]Value  // Since odin doesn't have any javascript objects we use maps with strings as keys
+```
+```
+// Lets say we have some json that looks like this:
+/*{
+    "foo": {
+        "bar": [139123, 1201]
+    }
+}*/
+
+// And we have parsed this json into a Value
+data, _ := json.parse_file("data.json")
+
+// To get bar we can do look through the union
+// So we can use unions type assertions to look into the Value and get our data
+bar := data.(json.Object)["foo"].(Object)["bar"]
+```
+
+* When we want to stringify a Value we can use the stringify_value proc from the utils file
+```
+#+feature dynamic-literals
+package main
+
+import "shared:odin-json-parser"
+import "core:fmt"
+
+main :: proc(){
+    // We can have some data which we want to stringify
+    value: json.Value = json.Object{"foo" = json.Object{"bar" = json.Array{23120, 123823}}}
+
+    // Remember to free your memory
+	defer if json.destroy_value(&value) != .NO_ERROR do panic("Failed to destroy value")
+
+    json_string, err := json.stringify_value(json_data)
+
+    // Handle an error if we get one 
+    if err != .NO_ERROR do handle_error()
+
+    // This string can be used to write to a file, or we can print it to see what the json would look like
+    fmt.println(json_string)
+}
+```
+
+#### More in depth usage and explanations
+
+
+
 
 ## Help
 
