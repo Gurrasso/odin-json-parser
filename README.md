@@ -25,7 +25,7 @@ The code is probably full of bugs, bad code and possibly memory leaks but it wor
 odin build path_to_code -debug
 ```
 
-* There is also a hard limit on tokens. Any token array has a max size but this can be changed by changing the <span style="color:yellow">MAX_TOKENS</span>. constant in the code
+* There is also a hard limit on tokens. Any token array has a max size but this can be changed by changing the MAX_TOKENS constant in the code
 ```odin
 // In the json.odin file we find this
 MAX_TOKENS :: 1024
