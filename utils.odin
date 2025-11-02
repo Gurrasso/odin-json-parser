@@ -11,8 +11,8 @@ has_file_suffix :: proc(filename: string, suffix: cstring) -> bool{
 }
 
 // just to clean up the json a little
-clean_file_data :: proc(data: File_data) -> string{
-	it := string(data)
+clean_file_data :: proc(data: File_data) -> File_data{
+	it := data
 
 	output: string
 
@@ -34,7 +34,7 @@ remove_whitespace :: proc(str: string) -> string{
 	return output
 }
 
-NUMBERS : [12]u8: {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '.'}
+NUMBERS : [13]u8: {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '+', '.'}
 
 // checks if char is a number or a . or -
 char_is_number :: proc(char: u8) -> bool{

@@ -226,4 +226,7 @@ No license right now, will maybe add one later.
     Have the option to get nice indented json back when stringifying. 
     Good for readability
 
+
+* I think floating point precision is causing some issues when converting strings to numbers
+
 * Continue to update the readme
