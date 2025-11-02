@@ -115,7 +115,7 @@ main :: proc(){
     value: json.Value = json.Object{"foo" = json.Object{"bar" = json.Array{23120, 123823}}}
 
     // Remember to free your memory
-	defer if json.destroy_value(&value) != .NO_ERROR do panic("Failed to destroy value")
+    defer if json.destroy_value(&value) != .NO_ERROR do panic("Failed to destroy value")
 
     json_string, err := json.stringify_value(json_data)
 
