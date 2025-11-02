@@ -1,4 +1,4 @@
-# ODIN json parser
+# ODIN JSON PARSER
 
 A parser and stringifier for json for the odin language.
 
@@ -18,7 +18,7 @@ The code is probably full of bugs, bad code and possibly memory leaks but it wor
 
 * To download just clone this repo and put it in your project or in your odin shared packages folder
 
-### Executing program
+### Using the package
 
 * There are some prints and such throughout the package. This is for debugging and most of them will only run when the "-debug" flag is used.
 ```
@@ -38,14 +38,11 @@ MAX_TOKENS :: 1024
 
 foo, err := get_data(bar)
 
-if err != .NO_ERROR do return foo, err
-
 // To see what the error does you can look at where it gets called or i might implement some sort of error check procedure in the future
-
+if err != .NO_ERROR do return foo, err
 ```
 
 #### Basic way to use the package
-
 
 * Lets look at how to use the parser using the parse_file proc in the utils file. This is the simplest way to parse a file.
 ```odin
@@ -59,7 +56,7 @@ main :: proc(){
 
     // Once we are done with our parsed data it is a good idea to free it from memory by calling the destroy_value proc
     // Here we just panic if we fail to destroy the value
-    defer if json.destroy_value(parsed_data) != .NO_ERROR do panic("Failed to destroy value")
+    defer if json.destroy_value(&parsed_data) != .NO_ERROR do panic("Failed to destroy value")
 
     // Handle an error if we get one 
     if err != .NO_ERROR do handle_error()
@@ -132,13 +129,73 @@ main :: proc(){
 
 #### More in depth usage and explanations
 
-Cooming soon
+##### * Parsing a json file
+
+* You can have a look through the parse_file proc and see how it works but here are the basics:
+```odin
+parse_file :: proc(filepath: string) -> (Value, Error){
+
+	// We first load the file and get the data
+	file_data, load_err := load_file(filepath)
+	if load_err != .NO_ERROR do return nil, load_err
+	
+    // And also delete the file data when we dont need it
+    defer delete(file_data) 
+
+	// Then we tokenize the file data
+    // It takes in File_data and turns it into a Tokens array
+	tokens, tokenizer_err := tokenize_json_data(file_data)
+	if tokenizer_err != .NO_ERROR do return nil, tokenizer_err
+
+	// It then takes the Tokens array and turns it into a Value struct
+	parsed_data, parse_err := parse(tokens)
+	if parse_err != .NO_ERROR do return nil, parse_err
+
+	return parsed_data, .NO_ERROR
+}
+```
+
+*   After we are done with the Value we can destroy it using the destroy_value proc.
+    The destroy_value proc takes in the pointer to a value and recursivly goes through and deletes everything.
+
+
+##### * Stringifying a Value
+
+* The stringify Value proc is quite simple, if you want you can have a look at it.
+
+* When we have stringified the Value we might want to write it to a file:
+```odin
+package main
+
+import "shared:odin-json-parser"
+import "core:os"
+
+main :: proc(){
+    value: json.Value = foo
+
+    json_string, _ := json.stringify_value(value)
+
+
+    // Try to create (or overwrite) a file
+    file, err := os.open("output.json", os.O_CREATE | os.O_WRONLY | os.O_TRUNC)
+    if err != nil {
+        return
+    }
+    defer os.close(file)
+
+    // Write the string to the file
+    bytes_written, err := os.write(file, json_string)
+    if err != nil {
+        return
+    }
+}
+```
 
 ## Help
 
-It's just odin code, there shouldn't be any major problems other than the code being bad. If you have a problem maybe try checking your odin version and if it's outdated update it.
+It's just odin code, there shouldn't be any major problems apart from the code being bad. If you have a problem maybe try checking your odin version and if it's outdated, update it.
 
-To check the version run this in your command prompt
+To check the version run this in your command prompt:
 ```
 odin version
 ```
