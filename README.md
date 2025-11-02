@@ -147,7 +147,7 @@ parse_file :: proc(filepath: string) -> (Value, Error){
     tokens, tokenizer_err := tokenize_json_data(file_data)
     if tokenizer_err != .NO_ERROR do return nil, tokenizer_err
 
-    // It then takes the Tokens array and turns it into a Value struct
+    // It then takes the Tokens array and turns it into a Value
     parsed_data, parse_err := parse(tokens)
     if parse_err != .NO_ERROR do return nil, parse_err
 
