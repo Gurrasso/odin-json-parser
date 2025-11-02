@@ -129,7 +129,7 @@ main :: proc(){
 
 #### More in depth usage and explanations
 
-##### * Parsing a json file
+#####   Parsing a json file
 
 * You can have a look through the parse_file proc and see how it works but here are the basics:
 ```odin
@@ -159,7 +159,7 @@ parse_file :: proc(filepath: string) -> (Value, Error){
     The destroy_value proc takes in the pointer to a value and recursivly goes through and deletes everything.
 
 
-##### * Stringifying a Value
+#####   Stringifying a Value
 
 * The stringify Value proc is quite simple, if you want you can have a look at it.
 
@@ -172,22 +172,11 @@ import "core:os"
 
 main :: proc(){
     value: json.Value = foo
+    defer json.destroy_value(value)
 
     json_string, _ := json.stringify_value(value)
 
-
-    // Try to create (or overwrite) a file
-    file, err := os.open("output.json", os.O_CREATE | os.O_WRONLY | os.O_TRUNC)
-    if err != nil {
-        return
-    }
-    defer os.close(file)
-
-    // Write the string to the file
-    bytes_written, err := os.write(file, json_string)
-    if err != nil {
-        return
-    }
+    // INSERT EXAMPLE OF HOW TO PUT A JSON STRING INTO A JSON FILE
 }
 ```
 
@@ -233,3 +222,5 @@ No license right now, will maybe add one later.
 
     Have the option to get nice indented json back when stringifying. 
     Good for readability
+
+* Continue to update the readme
