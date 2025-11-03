@@ -96,7 +96,7 @@ Lets say we have some json that looks like this:
 ```
 We can parse this json into a Value and get our data
 ```odin
-data, _ := json.parse_file("path_to_our_file.json")
+data, _ := json.parse_file("path_to_file.json")
 
 // To get bar we can do look through the union
 // We can use unions type assertions to look into the Value and get our data
@@ -139,6 +139,7 @@ main :: proc(){
 parse_file :: proc(filepath: string) -> (Value, Error){
 
     // We first load the file and get the data
+    // If we already have a string with json we can skip this step and just go to tokenizing and parsing
     file_data, load_err := load_file(filepath)
     if load_err != .NO_ERROR do return nil, load_err
 
@@ -172,6 +173,7 @@ package main
 
 import "shared:odin-json-parser"
 import "core:os"
+import "core:fmt"
 
 main :: proc(){
     value: json.Value = foo
@@ -179,7 +181,15 @@ main :: proc(){
 
     json_string, _ := json.stringify_value(value)
 
-    // INSERT EXAMPLE OF HOW TO PUT A JSON STRING INTO A JSON FILE
+    file := "path_to_file.json"
+
+    f, err := os.open(file, os.O_WRONLY | os.O_CREATE | os.O_TRUNC)
+    if err != nil {
+		handle_error()
+    }
+    defer os.close(f)
+
+    fmt.fprintln(f, json_string)
 }
 ```
 
