@@ -165,8 +165,8 @@ tokenize :: proc(data: string, i: ^int) -> (Token, Error){
 // =====================
 
 //Type definitions
-Integer :: int
-Float   :: f32
+Integer :: i64
+Float   :: f64
 Boolean :: bool
 String  :: string
 Array   :: distinct [dynamic]Value
@@ -210,8 +210,8 @@ parse_token :: proc(index: int, tokens: Tokens) -> (Value, Error){
 
 		ok: bool
 		
-		if number_value_is_float(token.value) do value, ok = strconv.parse_f32(token.value)
-		else do value, ok = strconv.parse_int(token.value)
+		if number_value_is_float(token.value) do value, ok = strconv.parse_f64(token.value)
+		else do value, ok = strconv.parse_i64(token.value)
 
 		if !ok do return value, .STRING_TO_NUMBER_CONVERSION_FAILED
 
@@ -370,7 +370,7 @@ get_tokens_from_value :: proc(value: Value) -> ([dynamic]Token, Error){
 		append(&tokens, Token{value = strings.clone(string_value), type = .NUMBER_VALUE})
 	case Float:
 		buf: [32]byte
-		string_value := strconv.write_float(buf[:], f64(value.(Float)), 'f', 14, 64)
+		string_value := strconv.write_float(buf[:], f64(value.(Float)), 'f', get_float_percision(value.(Float)), 64)
 		append(&tokens, Token{value = strings.clone(string_value), type = .NUMBER_VALUE})
 	case Boolean:
 		buf: [32]byte

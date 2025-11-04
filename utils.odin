@@ -2,6 +2,7 @@ package json
 
 import "core:strings"
 import "core:fmt"
+import "core:math"
 
 has_file_suffix :: proc(filename: string, suffix: cstring) -> bool{
 	filename := string(filename)
@@ -151,4 +152,14 @@ append_to_tokens_slice :: proc(tokens: ^Tokens, cursor: ^int, append_value: []To
 	}
 
 	return .NO_ERROR
+}
+
+// I think this works fine????
+get_float_percision :: proc(f: Float) -> int{
+	e := 1
+	for i in 0..<math.MAX_F64_PRECISION {
+  	if (math.round(f * Float(e)) / Float(e) != f) do e *= 10
+		else do break
+	}
+  return int(math.round(math.ln(Float(e)) / math.LN10))
 }

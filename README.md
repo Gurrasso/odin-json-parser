@@ -79,8 +79,8 @@ Value :: union {
 }
 
 // And all the types look like this
-Integer :: int
-Float   :: f32
+Integer :: i64
+Float   :: f64
 Boolean :: bool
 String  :: string
 Array   :: distinct [dynamic]Value    // The Array and Object types contain Value which means we can have values in values in values just like with javascript objects
