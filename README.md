@@ -237,6 +237,6 @@ No license right now, will maybe add one later.
     Good for readability
 
 
-* I think floating point precision is causing some issues when converting strings to numbers
+* Maybe remove the limit on tokens
 
 * Continue to update the readme
