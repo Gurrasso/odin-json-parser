@@ -32,7 +32,7 @@ MAX_TOKENS :: 1024
 ```
 
 
-* Lets take a small look at the error handeling
+* A small look at the error handeling
 ```odin
 // Errors are an enum and any error will be returned through the procedures like this.
 
@@ -46,7 +46,7 @@ if err != .NO_ERROR do return foo, err
 
 #####   Parsing a json file
 
-* Lets look at how to use the parser using the parse_file proc in the utils file. This is the simplest way to parse a file.
+* How to use the parser using the parse_file proc in the utils file. This is the simplest way to parse a file.
 ```odin
 package main
 
