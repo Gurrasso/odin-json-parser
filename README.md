@@ -204,7 +204,7 @@ odin version
 
 ## License
 
-No license right now, will maybe add one later.
+Distributed under the MIT License.
 
 ## TODO
 
