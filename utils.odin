@@ -80,7 +80,6 @@ parse_file :: proc(filepath: string) -> (Value, Error){
 	// Load the file and get the data
 	file_data, load_err := load_file(filepath)
 	if load_err != .NO_ERROR do return nil, load_err
-	defer delete(file_data) // Free the file data after parse is done
 
 	// Tokenize file data
 	tokens, tokenizer_err := tokenize_file_data(file_data)

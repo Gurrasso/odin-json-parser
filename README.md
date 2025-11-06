@@ -143,9 +143,6 @@ parse_file :: proc(filepath: string) -> (Value, Error){
     file_data, load_err := load_file(filepath)
     if load_err != .NO_ERROR do return nil, load_err
 
-    // And also delete the file data when we dont need it
-    defer delete(file_data) 
-
     // Then we tokenize the file data
     // It takes in File_data and turns it into a Tokens array
     tokens, tokenizer_err := tokenize_file_data(file_data)
