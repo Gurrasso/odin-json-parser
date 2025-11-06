@@ -41,7 +41,7 @@ Token_type :: enum{
 MAX_TOKENS :: 1024
 
 // Takes in json data and tokenizes it line by line
-tokenize_json_data :: proc(data: File_data) -> (Tokens, Error){
+tokenize_file_data :: proc(data: File_data) -> (Tokens, Error){
 	string_data := clean_file_data(data)
 	no_whitespace_string_data := remove_whitespace(string_data)
 	
@@ -183,7 +183,7 @@ Value :: union {
 }
 
 // Initiates the recursive tokenizing
-parse :: proc(tokens: Tokens) -> (Value, Error){
+parse_tokens :: proc(tokens: Tokens) -> (Value, Error){
 	value, err := parse_token(0, tokens)
 
 	if err != .NO_ERROR do return value, err

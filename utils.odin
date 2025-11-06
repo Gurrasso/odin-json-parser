@@ -83,11 +83,11 @@ parse_file :: proc(filepath: string) -> (Value, Error){
 	defer delete(file_data) // Free the file data after parse is done
 
 	// Tokenize file data
-	tokens, tokenizer_err := tokenize_json_data(file_data)
+	tokens, tokenizer_err := tokenize_file_data(file_data)
 	if tokenizer_err != .NO_ERROR do return nil, tokenizer_err
 
 	// Parse data
-	parsed_data, parse_err := parse(tokens)
+	parsed_data, parse_err := parse_tokens(tokens)
 	if parse_err != .NO_ERROR do return nil, parse_err
 
 	return parsed_data, .NO_ERROR
