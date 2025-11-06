@@ -370,7 +370,7 @@ get_tokens_from_value :: proc(value: Value) -> ([dynamic]Token, Error){
 		append(&tokens, Token{value = strings.clone(string_value), type = .NUMBER_VALUE})
 	case Float:
 		buf: [32]byte
-		string_value := strconv.write_float(buf[:], f64(value.(Float)), 'f', get_float_percision(value.(Float)), 64)
+		string_value := strconv.write_float(buf[:], f64(value.(Float)), 'f', get_float_precision(value.(Float)), 64)
 		append(&tokens, Token{value = strings.clone(string_value), type = .NUMBER_VALUE})
 	case Boolean:
 		buf: [32]byte

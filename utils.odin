@@ -155,7 +155,7 @@ append_to_tokens_slice :: proc(tokens: ^Tokens, cursor: ^int, append_value: []To
 }
 
 // I think this works fine????
-get_float_percision :: proc(f: Float) -> int{
+get_float_precision :: proc(f: Float) -> int{
 	e := 1
 	for i in 0..<math.MAX_F64_PRECISION {
   	if (math.round(f * Float(e)) / Float(e) != f) do e *= 10
