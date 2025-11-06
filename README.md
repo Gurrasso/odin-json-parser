@@ -1,12 +1,12 @@
 # ODIN JSON PARSER
 
-A parser and stringifier for json for the odin language.
+A json parser and stringifier for the odin language.
 
 ## Description
 
-This is a simple parser and stringifier for odin. This can be used to write json to a file or to read json from a file. It's still a work in progress but the base functionality is there. Just so you know there is already a json parser inside of "core:encoding/json".
+This is a simple json parser and json stringifier for odin. This can be used to write json to a file or to read json from a file. It's still a work in progress but the base functionality is there. Just so you know there is already a json parser inside of "core:encoding/json".
 
-The code is probably full of bugs, bad code and possibly memory leaks but it works. It also isn't very strict on your json syntax.
+The code is probably full of bugs, bad code and possibly memory leaks but it works.
 
 ## Getting Started
 
