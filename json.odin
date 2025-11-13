@@ -63,7 +63,7 @@ tokenize_file_data :: proc(data: File_data) -> (Tokens, Error){
 
 		if err != .NO_ERROR do return tokens, err
 
-		err = append_to_tokens(&tokens, &tokens_cursor, value)
+		err = append_token_to_tokens(&tokens, &tokens_cursor, value)
 
 		if err != .NO_ERROR do return tokens, err
 	}
@@ -350,7 +350,7 @@ tokenize_value :: proc(value: Value) -> (Tokens, Error){
 	tokens, err := get_tokens_from_value(value)
 	if err != .NO_ERROR do return return_tokens, err
 
-	append_to_tokens_slice(&return_tokens, &tokens_cursor, tokens[:])
+	append_slice_to_tokens(&return_tokens, &tokens_cursor, tokens[:])
 
 	delete_dynamic_array(tokens)
 

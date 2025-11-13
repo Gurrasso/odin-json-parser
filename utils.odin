@@ -124,7 +124,7 @@ destroy_value :: proc(value: ^Value) -> Error{
 }
 
 //tries to append tokens or a token to a tokens array
-append_to_tokens :: proc(tokens: ^Tokens, cursor: ^int, append_value: ..Token) -> Error{
+append_token_to_tokens :: proc(tokens: ^Tokens, cursor: ^int, append_value: ..Token) -> Error{
 	if cursor^ >= len(tokens)-1{
 		// We have exceeded the max amount of tokens
 		return .TOKEN_LIMIT_EXCEEDED
@@ -139,7 +139,7 @@ append_to_tokens :: proc(tokens: ^Tokens, cursor: ^int, append_value: ..Token) -
 }
 
 //tries to append tokens or a token to a tokens array
-append_to_tokens_slice :: proc(tokens: ^Tokens, cursor: ^int, append_value: []Token) -> Error{
+append_slice_to_tokens :: proc(tokens: ^Tokens, cursor: ^int, append_value: []Token) -> Error{
 	if cursor^ >= len(tokens)-1{
 		// We have exceeded the max amount of tokens
 		return .TOKEN_LIMIT_EXCEEDED
