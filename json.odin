@@ -281,13 +281,6 @@ parse_token :: proc(index: int, tokens: Tokens) -> (Value, Error){
 
 			t := tokens[j]
 
-			if t.type == .OPEN_SQUARE_BRACKET{
-				bracket_count += 1
-			}else if t.type == .CLOSED_SQUARE_BRACKET{
-				bracket_count -= 1
-			}
-
-
 			if bracket_count == 0{
 				break
 			}else if bracket_count == 1{
@@ -308,6 +301,15 @@ parse_token :: proc(index: int, tokens: Tokens) -> (Value, Error){
 					append(&array, v)
 				}
 			}
+
+			// Add or remove from the bracket count if we encounter a bracket
+			if t.type == .OPEN_SQUARE_BRACKET || t.type == .OPEN_CURLY_BRACKET{
+				bracket_count += 1
+			}else if t.type == .CLOSED_SQUARE_BRACKET || t.type == .CLOSED_CURLY_BRACKET{
+				bracket_count -= 1
+			}
+
+
 		}
 
 		value = array
