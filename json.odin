@@ -291,7 +291,7 @@ parse_token :: proc(index: int, tokens: Tokens) -> (Value, Error){
 			if bracket_count == 0{
 				break
 			}else if bracket_count == 1{
-				if t.type == .OPEN_SQUARE_BRACKET || t.type == .OPEN_SQUARE_BRACKET || t.type == .STRING_VALUE || t.type == .NUMBER_VALUE || t.type == .BOOL_VALUE || t.type == .NULL_VALUE{
+				if t.type == .OPEN_SQUARE_BRACKET || t.type == .OPEN_CURLY_BRACKET || t.type == .STRING_VALUE || t.type == .NUMBER_VALUE || t.type == .BOOL_VALUE || t.type == .NULL_VALUE{
 					
 					v, err := parse_token(j, tokens)
 
