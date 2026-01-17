@@ -37,7 +37,7 @@ remove_whitespace :: proc(str: string) -> string{
 
 NUMBERS : [13]u8: {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '+', '.'}
 
-// checks if char is a number or a . or -
+// checks if char is a number, a "." or a + or -
 char_is_number :: proc(char: u8) -> bool{
 	for num in NUMBERS{
 		if char == num do return true
@@ -57,7 +57,7 @@ string_is_number :: proc(value: string) -> bool{
 
 VALID_TOKENS : [8]u8: {'{', '}', '[', ']', ',', ':', ' ', '	'}
 
-// checks if char is a number or a . or -
+// checks if char is a valid token
 char_is_token :: proc(char: u8) -> bool{
 	for t in VALID_TOKENS{
 		if char == t do return true
