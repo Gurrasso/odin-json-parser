@@ -9,11 +9,11 @@ File_data :: string
 load_file :: proc(filepath: string) -> (file_data: File_data, err: Error){
 	if !has_file_suffix(filepath, "json") do return "", .NOT_VALID_JSON_FILE
 
-	data, ok := os.read_entire_file(filepath, context.allocator)
+	data, read_err := os.read_entire_file(filepath, context.allocator)
 	// Delete the data slice
 	defer delete(data)
 	
-	if !ok {
+	if read_err != nil {
 		// could not read file
 
 		return "", .FILE_READ_FAILED 
